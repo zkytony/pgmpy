@@ -181,7 +181,7 @@ class DiscreteFactor(BaseFactor, StateNameMixin):
         for var in self.variables:
             if var not in assignments.keys():
                 raise ValueError(f"Variable: {var} not found in arguments")
-            if assignments[var] in self.name_to_no[var]:
+            if state_names and assignments[var] in self.name_to_no[var]:
                 index.append(self.name_to_no[var][assignments[var]])
             else:
                 warn(f"Using {var} state as number instead of name.")

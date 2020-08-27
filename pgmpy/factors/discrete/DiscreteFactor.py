@@ -150,15 +150,16 @@ class DiscreteFactor(BaseFactor, StateNameMixin):
 
         return {var: self.cardinality[self.variables.index(var)] for var in variables}
 
-    def get_value(self, **kwargs):
+    def get_value(self, assignments, state_names=True):
         """
         Returns the value of the given variable states.
 
         Parameters
         ----------
-        kwargs: named arguments of the form variable=state_name
-            Spcifies the state of each of the variable for which to get
-            the probability value.
+        assignments: A dictionary from variable to value. 
+        state_names: If true, then the value in the `assignments` are treated as
+                     names that will be mapped to an index number in the table entry.
+                     Note that there is no requirement for the state name to be a string.
 
         Returns
         -------
@@ -172,19 +173,19 @@ class DiscreteFactor(BaseFactor, StateNameMixin):
         >>> phi.get_value(lung="yes", tub="no", either="yes")
         1.0000
         """
-        for variable in kwargs.keys():
+        for variable in assignments.keys():
             if variable not in self.variables:
                 raise ValueError(f"Factor doesn't have the variable: {variable}")
 
         index = []
         for var in self.variables:
-            if var not in kwargs.keys():
+            if var not in assignments.keys():
                 raise ValueError(f"Variable: {var} not found in arguments")
-            elif isinstance(kwargs[var], str):
-                index.append(self.name_to_no[var][kwargs[var]])
+            if assignments[var] in self.name_to_no[var]:
+                index.append(self.name_to_no[var][assignments[var]])
             else:
                 warn(f"Using {var} state as number instead of name.")
-                index.append(kwargs[var])
+                index.append(assignments[var])
         return self.values[tuple(index)]
 
     def set_value(self, value, **kwargs):
